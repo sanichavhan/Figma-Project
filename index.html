@@ -16,11 +16,22 @@
       <div class="logo">Figma Pro</div>
       <div class="nav-content">
         <i class="ri-cursor-line"></i>
-        <i class="ri-square-line"></i>
+        <i id="square" class="ri-square-line"></i>
         <i class="ri-text"></i>
         <i class="ri-delete-bin-7-line"></i>
         <i class="ri-arrow-go-back-line"></i>
         <i class="ri-chat-3-line"></i>
+      </div>
+      <!-- Popup Div -->
+      <div class="popup" id="popup">
+        <div class="popup-content">
+          <i class="ri-rectangle-line tool" data-tool="rect"></i>
+          <i class="ri-circle-line tool" data-tool="circle"></i>
+          <i class="ri-text tool" data-tool="text"></i>
+          <i class="ri-image-line tool" data-tool="image"></i>
+          <i class="ri-sketching tool" data-tool="sketch"></i>
+          <input type="file" id="imageInput" hidden />
+        </div>
       </div>
       <div class="theme">Change Theme</div>
     </div>
@@ -29,7 +40,7 @@
         <h2>Layers</h2>
         <div class="layer-list"></div>
       </div>
-      <div class="canvas-area"></div>
+      <canvas id="board"></canvas>
       <div class="tools-area">
         <div class="info">
           <h4>DESIGN</h4>
@@ -68,15 +79,15 @@
         <div class="color-panel">
           <div class="label1">COLOR</div>
             <div class="color-row">
-              <input type="color" id="colorPicker" value="#aabbcc">
-              <input type="text" id="colorHex" value="#aabbcc">
+              <input type="color" id="colorPicker" value="#ffffff">
+              <input type="text" id="colorHex" value="#ffffff">
             </div>
         </div>
         <div class="color-panel">
           <div class="label1">STROKE</div>
             <div class="color-row">
-              <input type="color" id="colorPicker" value="#aabbcc">
-              <input type="text" id="colorHex" value="#aabbcc">
+              <input type="color" id="strokePicker" value="#000000">
+              <input type="text" id="strokeHex" value="#000000">
             </div>
         </div>
         <div class="export">
@@ -88,6 +99,6 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>

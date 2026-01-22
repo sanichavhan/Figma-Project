@@ -11,6 +11,7 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 :root {
   --pri: #0f172a;
@@ -46,7 +47,9 @@ body {
 }
 .nav-content i{
   cursor: pointer;
+  /* pointer-events: auto; */
 }
+
 .theme{
   padding-right: 20px;
   font-size: 25px;
@@ -85,54 +88,11 @@ body {
   color: rgb(141, 201, 229);
 }
 
-.layer-list {
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.layer-item {
-  cursor: pointer;
-  font-size: 13px;
-  color: rgb(141, 201, 229);
-}
-
-.layer-item.active {
-  color: #3b82f6;
-}
-.layer-controls {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-}
-
-.layer-controls button {
-  background: transparent;
-  border: 1px solid gray;
-  color: rgb(141, 201, 229);
-  cursor: pointer;
-  font-size: 12px;
-}
-.group-controls {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-}
-
-.group-controls button {
-  background: transparent;
-  border: 1px solid gray;
-  color: rgb(141, 201, 229);
-  cursor: pointer;
-  font-size: 12px;
-}
-
-
-.canvas-area{
+#board{
   background-color: var(--tri2);
   width: 1100px;
-  transform-origin: 0 0;
+  border: 2px dashed #ccc;
+  cursor: crosshair;  
 }
 .tools-area{
   background-color: var(--sec);
@@ -140,7 +100,6 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--tri1);
-  /* gap: 50px; */
 }
 .info{
   display: flex;
@@ -286,3 +245,46 @@ input[type="text"] {
   cursor: pointer;
   border-radius: 6px;
 }
+
+.popup {
+  display: none;
+  color: #3b82f6;
+  position: absolute;
+  left: 150;
+  transition: all 0.6s ease;
+}
+
+
+/* Popup Content */
+.popup-content {
+  transition: all 0.6s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgb(19, 19, 19);
+  width: 100px;
+  color: white;
+  padding: 10px;
+  margin: 200px auto;
+  border-radius: 10px;
+  text-align: center;
+  gap: 15px;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.popup.active {
+  display: block;
+  transition: all 0.6s ease;
+}
+
+.tool {
+  font-size: 24px;
+  cursor: pointer;
+  margin: 6px;
+}
+
+.tool.active {
+  color: #2196f3;
+}
+
