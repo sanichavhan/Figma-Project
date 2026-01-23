@@ -1,8 +1,16 @@
-* {
+@font-face {
+  font-family: neu;
+  src: url(./Font/NeueMachina.ttf);
+}
+@font-face {
+  font-family: theme;
+  src: url(./Font/home-writing/Home\ Writing.ttf);
+}
+*{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif,'Times New Roman', Times, serif, Helvetica,theme;
 }
 
 body {
@@ -37,13 +45,14 @@ body {
   align-items: center;
 }
 .logo{
+  font-family: neu;
   padding-left: 20px;
   font-size: 25px;
 }
 .nav-content{
   display: flex;
-  gap: 25px;
-  font-size: 23px;
+  gap: 50px;
+  font-size: 26px;
 }
 .nav-content i{
   cursor: pointer;
@@ -54,6 +63,7 @@ body {
   padding-right: 20px;
   font-size: 25px;
   cursor: pointer;
+  font-family: 'Times New Roman', Times, serif;
 }
 
 /* hero */
@@ -216,16 +226,17 @@ input[type="text"] {
   padding: 8px;
   outline: none;
 }
-
+/* Expport Files   */
 .export{
   display: flex;
-  gap: 20px;
+  gap: 2px;
   align-items: center;
   justify-content: center;
   padding-top: 16px;
   border: 1px solid gray;
   height: 100px;
 }
+/* Export into PDF */
 .export .pdf{
   font-size: 12px;
   border: 1px solid gray;
@@ -237,8 +248,22 @@ input[type="text"] {
 .pdf.active{
   transform: scale(0.95);
 }
-
+/* Export File into PNG */
 .png{
+  font-size: 12px;
+  border: 1px solid gray;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.json{
+  font-size: 12px;
+  border: 1px solid gray;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.html{
   font-size: 12px;
   border: 1px solid gray;
   padding: 5px;
@@ -255,7 +280,7 @@ input[type="text"] {
 }
 
 
-/* Popup Content */
+/* Popup Content for Selecting elements */
 .popup-content {
   transition: all 0.6s ease;
   display: flex;
@@ -287,4 +312,3 @@ input[type="text"] {
 .tool.active {
   color: #2196f3;
 }
-
