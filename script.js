@@ -1,4 +1,3 @@
-/* ================= 1. INITIAL SETUP & STATE ================= */
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const layerList = document.querySelector('.layer-list');
@@ -16,7 +15,6 @@ let startX, startY;
 let dragOffsets = [];
 let activeTextInput = null;
 
-// Populate Font Size (1 to 120)
 const fontSizeSelect = document.getElementById("fontSize");
 if (fontSizeSelect && fontSizeSelect.options.length === 0) {
     for (let i = 1; i <= 120; i++) {
@@ -43,7 +41,6 @@ function init() {
 }
 window.addEventListener('load', init);
 
-/* ================= 2. UNDO & PERSISTENCE ================= */
 function saveState() {
     undoStack.push(JSON.stringify(objects));
     if (undoStack.length > 30) undoStack.shift(); 
@@ -55,12 +52,10 @@ function saveAndRefresh() {
     render();
 }
 
-/* ================= 3. KEYBOARD: DELETE, UNDO & TYPE-IN-SHAPE ================= */
 window.addEventListener('keydown', (e) => {
-    // Prevent global shortcuts if using an input field
+
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || activeTextInput) return;
 
-    // A. Ctrl + Z (Undo)
     if (e.ctrlKey && e.key === 'z') {
         if (undoStack.length > 0) {
             objects = JSON.parse(undoStack.pop());
@@ -70,8 +65,6 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    // B. Delete / Backspace (Remove Entire Component)
-    // Only triggers delete if not typing inside a shape
     if (e.key === 'Delete' || (e.key === 'Backspace' && selectedObjects.length === 1 && !selectedObjects[0].label)) {
         if (selectedObjects.length > 0) {
             saveState();
@@ -81,16 +74,15 @@ window.addEventListener('keydown', (e) => {
         }
         return;
     }
-
-    // C. Type-Inside-Shape Logic
+    
     if (selectedObjects.length === 1) {
         let obj = selectedObjects[0];
-        // Allow typing inside specific shapes
+    
         if (['rect', 'circle', 'triangle'].includes(obj.type)) {
-            if (e.key.length === 1) { // Normal characters
+            if (e.key.length === 1) { 
                 obj.label = (obj.label || "") + e.key;
                 saveAndRefresh();
-            } else if (e.key === 'Backspace' && obj.label) { // Backspace for label text
+            } else if (e.key === 'Backspace' && obj.label) { 
                 obj.label = obj.label.slice(0, -1);
                 saveAndRefresh();
             }
@@ -98,7 +90,6 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-/* ================= 4. SELECTION & COLLISION ================= */
 function getMouse(e) {
     const rect = canvas.getBoundingClientRect();
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -130,13 +121,10 @@ function selectLayer(index) {
     }
 }
 
-/* ================= 5. MOUSE EVENT HANDLERS ================= */
-/* ================= 1. RESIZE STATE & CONSTANTS ================= */
 let isResizing = false;
-let currentHandle = null; // 'tl', 'tr', 'bl', 'br', 'tc'
+let currentHandle = null; 
 const HANDLE_SIZE = 8;
 
-/* ================= 2. DETECTION LOGIC ================= */
 function getHandleAt(m, obj) {
     if (!selectedObjects.includes(obj)) return null;
 
@@ -147,12 +135,12 @@ function getHandleAt(m, obj) {
     const midX = obj.x + obj.w / 2;
 
     if (obj.type === 'triangle') {
-        // Triangle handles: Top Tip, Bottom Left, Bottom Right
+        
         if (Math.hypot(m.x - midX, m.y - top) < HANDLE_SIZE) return 'tc';
         if (Math.hypot(m.x - left, m.y - bottom) < HANDLE_SIZE) return 'bl';
         if (Math.hypot(m.x - right, m.y - bottom) < HANDLE_SIZE) return 'br';
     } else {
-        // Rect and Circle handles: 4 Corners
+    
         if (Math.hypot(m.x - left, m.y - top) < HANDLE_SIZE) return 'tl';
         if (Math.hypot(m.x - right, m.y - top) < HANDLE_SIZE) return 'tr';
         if (Math.hypot(m.x - left, m.y - bottom) < HANDLE_SIZE) return 'bl';
@@ -161,11 +149,9 @@ function getHandleAt(m, obj) {
     return null;
 }
 
-/* ================= 3. MOUSE EVENTS (RESIZE INTEGRATION) ================= */
 canvas.addEventListener('mousedown', (e) => {
     const m = getMouse(e);
     
-    // Check if clicking a resize handle first
     if (selectedObjects.length === 1) {
         const handle = getHandleAt(m, selectedObjects[0]);
         if (handle) {
@@ -204,7 +190,7 @@ canvas.addEventListener('mousemove', (e) => {
     const obj = selectedObjects[0];
 
     if (isResizing && obj) {
-        // Logic for resizing based on which handle is grabbed
+        
         if (currentHandle === 'br') { obj.w = m.x - obj.x; obj.h = m.y - obj.y; }
         else if (currentHandle === 'bl') { const oldR = obj.x + obj.w; obj.x = m.x; obj.w = oldR - m.x; obj.h = m.y - obj.y; }
         else if (currentHandle === 'tr') { const oldB = obj.y + obj.h; obj.y = m.y; obj.h = oldB - m.y; obj.w = m.x - obj.x; }
@@ -220,8 +206,7 @@ canvas.addEventListener('mousemove', (e) => {
     else if (isDrawing) {
         obj.w = m.x - startX; obj.h = m.y - startY;
     }
-    
-    // Change cursor style when hovering handles
+
     if (selectedObjects.length === 1) {
         canvas.style.cursor = getHandleAt(m, obj) ? 'nwse-resize' : 'default';
     }
@@ -235,7 +220,6 @@ canvas.addEventListener('mouseup', () => {
     saveAndRefresh();
 });
 
-/* ================= 4. UPDATED RENDER (DRAW HANDLES) ================= */
 function drawHandles(obj) {
     ctx.fillStyle = "#3b82f6";
     ctx.setLineDash([]);
@@ -249,16 +233,10 @@ function drawHandles(obj) {
     });
 }
 
-// Add 'drawHandles(obj)' inside your render loop when 'selectedObjects.includes(obj)' is true.
-
-/* ================= 6. RENDER ENGINE ================= */
-/* ================= 1. THE REFINED PROPERTY UPDATER ================= */
-// This logic now supports both shape properties and text/label properties
 const updateProp = (prop, val) => {
     selectedObjects.forEach(obj => { 
         obj[prop] = val; 
         
-        // Logic sync: If changing stroke, also update label color for visibility
         if (prop === 'stroke' && !obj.labelColor) {
             obj.labelColor = val;
         }
@@ -266,46 +244,41 @@ const updateProp = (prop, val) => {
     saveAndRefresh();
 };
 
-/* ================= 2. EVENT LISTENERS FOR ALL PANELS ================= */
-// Width & Height
+
 document.getElementById('widthInput').addEventListener('input', e => updateProp('w', parseInt(e.target.value)));
 document.getElementById('heightInput').addEventListener('input', e => updateProp('h', parseInt(e.target.value)));
 
-// Shape Background (Fill)
+
 document.getElementById('colorPicker').addEventListener('input', e => {
     document.getElementById('colorHex').value = e.target.value;
-    updateProp('fill', e.target.value); // Changes the background of the shape
+    updateProp('fill', e.target.value); 
 });
 
-// Shape Border & Text Color
 document.getElementById('strokePicker').addEventListener('input', e => {
     document.getElementById('strokeHex').value = e.target.value;
-    updateProp('stroke', e.target.value); // Changes the border
-    updateProp('labelColor', e.target.value); // Changes the text inside
+    updateProp('stroke', e.target.value); 
+    updateProp('labelColor', e.target.value); 
 });
 
-// Typography Controls
 document.getElementById('fontFamily').addEventListener('change', e => updateProp('fontFamily', e.target.value));
 document.getElementById('fontSize').addEventListener('change', e => updateProp('fontSize', parseInt(e.target.value)));
 document.getElementById('fontStyle').addEventListener('change', e => updateProp('fontStyle', e.target.value));
 
-/* ================= 3. UPDATED RENDER ENGINE ================= */
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     objects.forEach(obj => {
         ctx.save();
         
-        // Setup base styles
+        
         ctx.strokeStyle = obj.stroke || "#ffffff";
         ctx.lineWidth = 2;
         if (selectedObjects.includes(obj)) {
             ctx.setLineDash([5, 5]);
-            ctx.strokeStyle = "#3b82f6"; // Selection highlight
+            ctx.strokeStyle = "#3b82f6";
         }
 
         ctx.fillStyle = (obj.fill === "transparent") ? "rgba(0,0,0,0)" : obj.fill;
 
-        // Shape Drawing logic
         if (obj.type === 'rect') {
             if (obj.fill !== "transparent") ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
             ctx.strokeRect(obj.x, obj.y, obj.w, obj.h);
@@ -323,8 +296,11 @@ function render() {
             if (obj.fill !== "transparent") ctx.fill();
             ctx.stroke();
         }
+        else if (obj.type === 'image' && obj.imgEl) {
+            ctx.drawImage(obj.imgEl, obj.x, obj.y, obj.w, obj.h);
+        }
         else if (obj.type === 'text') {
-            // Standalone Text properties
+            
             const weight = (obj.fontStyle === 'bold' || obj.fontStyle === '600') ? 'bold ' : '';
             const style = (obj.fontStyle === 'italic') ? 'italic ' : '';
             ctx.font = `${style}${weight}${obj.fontSize}px ${obj.fontFamily}`;
@@ -332,12 +308,11 @@ function render() {
             ctx.fillText(obj.text, obj.x, obj.y);
         }
 
-        // --- DRAWING LABELS INSIDE SHAPES ---
         if (obj.label && ['rect', 'circle', 'triangle'].includes(obj.type)) {
-            ctx.setLineDash([]); // Reset dash for text
-            ctx.fillStyle = obj.labelColor || obj.stroke || "#ffffff"; // Use custom text color
+            ctx.setLineDash([]); 
+            ctx.fillStyle = obj.labelColor || obj.stroke || "#ffffff"; 
             
-            // Text styling from sidebar
+           
             const weight = (obj.fontStyle === 'bold' || obj.fontStyle === '600') ? 'bold ' : '';
             const style = (obj.fontStyle === 'italic') ? 'italic ' : '';
             ctx.font = `${style}${weight}${obj.fontSize}px ${obj.fontFamily}`;
@@ -355,18 +330,33 @@ function render() {
     });
 }
 
-/* ================= 7. UI & THEME LOGIC ================= */
+
 imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
         const img = new Image();
         img.src = ev.target.result;
         img.onload = () => {
-            objects.push({ id: Date.now(), type: 'image', x: 100, y: 100, w: 300, h: 300, src: img.src, imgEl: img, fill: 'transparent', stroke: 'transparent' });
+            saveState();
+            const newImgObj = {
+                id: Date.now(),
+                type: 'image',
+                x: 100, y: 100, 
+                w: 500, h: 500, 
+                src: img.src,
+                imgEl: img,
+                fill: 'transparent',
+                stroke: 'transparent',
+                label: ""
+            };
+            objects.push(newImgObj);
+            selectedObjects = [newImgObj]; 
             saveAndRefresh();
         };
     };
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(file);
 });
 
 square.addEventListener("click", (e) => {
@@ -398,7 +388,6 @@ function syncSidebar(obj) {
     document.getElementById('heightInput').value = Math.round(obj.h);
 }
 
-// Keep your Export and Theme listeners here (same as before)
 function changeTheme() {
     var themeBtn = document.querySelector('.theme');
     var root = document.documentElement;
@@ -434,25 +423,19 @@ function changeTheme() {
 }
 changeTheme();
 
-/* ================= 9. JSON & HTML EXPORTS ================= */
-
-// 1. Export as JSON (Saves the data structure for later import)
 document.querySelector('.json').addEventListener('click', () => {
-    // Create a blob of the current objects array
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(objects, null, 2));
     const downloadAnchorNode = document.createElement('a');
     
     downloadAnchorNode.setAttribute("href", dataStr);
     downloadAnchorNode.setAttribute("download", "figma_pro_design.json");
-    document.body.appendChild(downloadAnchorNode); // Required for Firefox
+    document.body.appendChild(downloadAnchorNode);
     
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 });
 
-// 2. Export as HTML (Generates a standalone preview file)
 document.querySelector('.html').addEventListener('click', () => {
-    // Boilerplate for the standalone HTML file
     let htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
@@ -475,7 +458,6 @@ document.querySelector('.html').addEventListener('click', () => {
     <body>
         <div class="canvas-preview">`;
 
-    // Map each canvas object to a CSS-styled HTML element
     objects.forEach(obj => {
         const left = obj.w < 0 ? obj.x + obj.w : obj.x;
         const top = obj.h < 0 ? obj.y + obj.h : obj.y;
@@ -500,53 +482,28 @@ document.querySelector('.html').addEventListener('click', () => {
             </div>`;
         }
     });
-
     htmlContent += `</div></body></html>`;
-
-    // Create a Blob and trigger download
     const blob = new Blob([htmlContent], { type: 'text/html' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = "design_preview.html";
     link.click();
 });
-
-/* ================= 10. PNG & PDF EXPORTS ================= */
-
-// 1. Export as PNG (High Resolution Image)
 document.querySelector('.png').addEventListener('click', () => {
-    // Generate a temporary link element
-    const link = document.createElement('a');
-    
-    // Set filename
+    const link = document.createElement('a'); 
     link.download = 'figma_pro_design.png';
-    
-    // Convert canvas content to Data URL (PNG format)
     link.href = canvas.toDataURL("image/png");
-    
-    // Trigger download
     link.click();
     link.remove();
 });
-
-// 2. Export as PDF (Using jsPDF Library)
 document.querySelector('.pdf').addEventListener('click', () => {
-    // Ensure the jsPDF library is loaded from your HTML script tag
     const { jsPDF } = window.jspdf;
-    
-    // Create new PDF instance: 'l' for landscape, 'px' for pixels
     const doc = new jsPDF({
         orientation: 'landscape',
         unit: 'px',
         format: [canvas.width, canvas.height]
     });
-
-    // Capture the current canvas state as an image
     const canvasImage = canvas.toDataURL("image/png");
-
-    // Add the image to the PDF (x: 0, y: 0, width, height)
     doc.addImage(canvasImage, 'PNG', 0, 0, canvas.width, canvas.height);
-
-    // Trigger PDF download
     doc.save('figma_pro_export.pdf');
 });
